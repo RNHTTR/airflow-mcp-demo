@@ -9,7 +9,7 @@ CONN_ID = os.getenv("PG_ANALYTICS_CONN_ID", "PG_ANALYTICS")
 with DAG(
     dag_id="enrich",
     start_date=pendulum.datetime(2024, 1, 1, tz="UTC"),
-    schedule=Asset("enrich"),
+    schedule=[Asset("enrich")],
     catchup=False,
     tags=["exec_dashboard"],
     doc_md="Creates/updates analytics.fct_pipeline_enriched from raw_salesforce_oppty.",
@@ -27,8 +27,8 @@ with DAG(
         """
         PostgresHook(CONN_ID).run(ddl)
 
-    @task
-    def transform(outlets=Asset("refresh_dashboard")):
+    @task(outlets=[Asset("refresh_dashboard")])
+    def transform():
         sql = """
         INSERT INTO analytics.fct_pipeline_enriched (id, is_new_acv, acv, opened_month)
         SELECT r.id,

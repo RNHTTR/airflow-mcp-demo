@@ -2,8 +2,7 @@ from __future__ import annotations
 import os
 import pendulum
 import requests
-from airflow import DAG
-from airflow.decorators import task
+from airflow.sdk import DAG, Asset, task
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 CONN_ID = os.getenv("PG_ANALYTICS_CONN_ID", "PG_ANALYTICS")
@@ -17,7 +16,7 @@ MB_CARD_ID = os.getenv("METABASE_CARD_ID")  # e.g., "1"
 with DAG(
     dag_id="refresh_dashboard",
     start_date=pendulum.datetime(2024, 1, 1, tz="UTC"),
-    schedule=None,
+    schedule=[Asset("refresh_dashboard")],
     catchup=False,
     tags=["exec_dashboard"],
     doc_md="Refreshes mv_exec_kpis and optionally warms a Metabase card.",

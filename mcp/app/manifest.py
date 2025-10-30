@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 import os
 import difflib
-from mcp.app.config import MANIFEST_PATH
+from app.config import MANIFEST_PATH
 
 # Keep the example inline; you can override with MANIFEST_PATH
 DEFAULT_MANIFEST: list[dict] = [
@@ -53,9 +53,9 @@ def _best_fuzzy_match(
     return None, 0.0
 
 
-def match_deliverable_fuzzy(name: str, manifest: list[dict], cutoff: float = 0.65) -> dict:
+def match_workflow_fuzzy(name: str, manifest: list[dict], cutoff: float = 0.65) -> dict:
     """
-    Fuzzy-match a deliverable name against the manifest.
+    Fuzzy-match a workflow name against the manifest.
 
     Matching strategy:
       1) Case-insensitive exact match
@@ -67,19 +67,19 @@ def match_deliverable_fuzzy(name: str, manifest: list[dict], cutoff: float = 0.6
     key = name.strip().lower()
     # 1) simple case-insensitive exact
     for m in manifest:
-        if m["deliverable"].strip().lower() == key:
+        if m["workflow"].strip().lower() == key:
             return m
 
     # 2 + 3) normalized exact or fuzzy
-    candidates = [m["deliverable"] for m in manifest]
+    candidates = [m["workflow"] for m in manifest]
     best, score = _best_fuzzy_match(name, candidates, cutoff=cutoff)
     if best is not None:
         for m in manifest:
-            if m["deliverable"] == best:
+            if m["workflow"] == best:
                 return m
 
     available = ", ".join(sorted(candidates))
     raise ValueError(
-        f"Unknown deliverable: '{name}'. "
+        f"Unknown workflow: '{name}'. "
         f"No close match (cutoff={cutoff}). Available: {available}"
     )

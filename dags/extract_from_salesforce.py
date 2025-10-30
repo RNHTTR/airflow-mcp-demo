@@ -1,7 +1,6 @@
 # requirements: faker, psycopg2-binary
 from __future__ import annotations
 import os
-from typing import List, Tuple
 import random
 from datetime import datetime
 
@@ -47,11 +46,11 @@ with DAG(
         hook = PostgresHook(postgres_conn_id=CONN_ID)
         hook.run(sql)
 
-    @task(outlets=Asset("enrich"))
+    @task(outlets=[Asset("enrich")])
     def generate_and_load(n_rows: int = 50) -> int:
         fake = Faker()
         stages = ["Prospecting", "Proposal", "Closed Won", "Closed Lost"]
-        rows: List[Tuple[str, datetime, str, float, str]] = []
+        rows: list[tuple[str, datetime, str, float, str]] = []
 
         for _ in range(n_rows):
             oid = fake.uuid4()

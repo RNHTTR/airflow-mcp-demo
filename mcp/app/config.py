@@ -12,8 +12,8 @@ import os
 AIRFLOW_BASE_URL: str = os.getenv("AIRFLOW_BASE_URL")
 
 # Authentication
-AIRFLOW_USERNAME: str | None = os.getenv("AIRFLOW_USERNAME")
-AIRFLOW_PASSWORD: str | None = os.getenv("AIRFLOW_PASSWORD")
+AIRFLOW_USERNAME: str | None = os.getenv("AIRFLOW_USERNAME", "admin")
+AIRFLOW_PASSWORD: str | None = os.getenv("AIRFLOW_PASSWORD", "admin")
 
 # --- Manifest configuration ---
 MANIFEST_PATH: str | None = os.getenv("MANIFEST_PATH")
