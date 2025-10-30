@@ -43,3 +43,28 @@ Contact
 =======
 
 The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+
+
+MCP demo: Natural language to refresh the Revenue Dashboard
+===========================================================
+
+This repo includes a simple data product definition and an orchestrator script that can take a natural language request like “refresh the revenue dashboard” and trigger the underlying DAGs in the right order. It also detects inter-DAG dependencies via `ExternalTaskSensor`, `TriggerDagRunOperator`, or asset/Dataset-based scheduling if present, and respects them.
+
+Data product definition lives at `include/data_products.json`:
+
+```json
+[{"data_product": "Revenue Dashboard", "dags": ["extract_from_salesforce", "enrich", "refresh_dashboard"]}]
+```
+
+Run the orchestrator from your host (with Airflow running):
+
+```bash
+python scripts/orchestrate_data_product.py "refresh the revenue dashboard"
+```
+
+The script attempts Airflow REST API first. Optionally configure env vars:
+
+- `AIRFLOW_API_URL` (e.g., `http://localhost:8080`)
+- `AIRFLOW_API_USER` / `AIRFLOW_API_PASSWORD`
+
+It falls back to the Airflow CLI (`airflow dags trigger` and `airflow dags list-runs`) if the API isn’t configured. It waits for each DAG to complete successfully before starting the next.

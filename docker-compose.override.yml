@@ -1,4 +1,18 @@
 services:
+  mcp:
+    build:
+      context: ./mcp
+      dockerfile: Dockerfile
+    image: airflow-mcp:local
+    stdin_open: true
+    tty: true
+    environment:
+      AIRFLOW_BASE_URL: http://host.docker.internal:8080/api/v2
+    volumes:
+      - ./mcp/app:/srv/mcp/app:ro
+      - ./tools:/srv/tools:ro
+      - ./resources:/srv/resources:ro
+      - ./manifest.json:/srv/manifest.json:ro
   postgres:
     volumes:
       - ./include/sql/init:/docker-entrypoint-initdb.d:ro

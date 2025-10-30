@@ -6,8 +6,7 @@ import random
 from datetime import datetime
 
 import pendulum
-from airflow import DAG
-from airflow.decorators import task
+from airflow.sdk import DAG, Asset, task
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from faker import Faker
 from psycopg2.extras import execute_values
@@ -48,7 +47,7 @@ with DAG(
         hook = PostgresHook(postgres_conn_id=CONN_ID)
         hook.run(sql)
 
-    @task
+    @task(outlets=Asset("enrich"))
     def generate_and_load(n_rows: int = 50) -> int:
         fake = Faker()
         stages = ["Prospecting", "Proposal", "Closed Won", "Closed Lost"]

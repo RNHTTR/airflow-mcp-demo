@@ -1,8 +1,7 @@
 from __future__ import annotations
 import os
 import pendulum
-from airflow import DAG
-from airflow.decorators import task
+from airflow.sdk import DAG, Asset, task
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 CONN_ID = os.getenv("PG_ANALYTICS_CONN_ID", "PG_ANALYTICS")
@@ -10,7 +9,7 @@ CONN_ID = os.getenv("PG_ANALYTICS_CONN_ID", "PG_ANALYTICS")
 with DAG(
     dag_id="enrich",
     start_date=pendulum.datetime(2024, 1, 1, tz="UTC"),
-    schedule=None,
+    schedule=Asset("enrich"),
     catchup=False,
     tags=["exec_dashboard"],
     doc_md="Creates/updates analytics.fct_pipeline_enriched from raw_salesforce_oppty.",
@@ -29,7 +28,7 @@ with DAG(
         PostgresHook(CONN_ID).run(ddl)
 
     @task
-    def transform():
+    def transform(outlets=Asset("refresh_dashboard")):
         sql = """
         INSERT INTO analytics.fct_pipeline_enriched (id, is_new_acv, acv, opened_month)
         SELECT r.id,
